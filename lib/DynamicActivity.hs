@@ -383,7 +383,7 @@ delActivityWorkspace wsid = do
   act <- getCurrentActivity
   ws <- getActivityWorkspaces . name $ act
   let eligible_ws = filter (not . belongToVisible act) ws
-  if length eligible_ws > 1 then
+  if length eligible_ws > 0 then
     windows (S.greedyView . head $ eligible_ws)
   else
     return ()
