@@ -434,6 +434,7 @@ promptAddActivityWorkspace :: XPConfig -> String -> X ()
 promptAddActivityWorkspace xp s =
    mkXPrompt (ActivityPrompt s) xp (const $ return []) addActivityWorkspace
 
+-- | Taken from DynamicWorkspace 0.11. Should be removed when I will be using xmonad 0.11
 removeWorkspace' :: (Eq i) => i -> S.StackSet i l a sid sd -> S.StackSet i l a sid sd
 removeWorkspace' torem s@(S.StackSet { S.current = scr@(S.Screen { S.workspace = wc })
                                    , S.hidden = (w:ws) })
@@ -445,6 +446,7 @@ removeWorkspace' torem s@(S.StackSet { S.current = scr@(S.Screen { S.workspace =
          meld (Just x) (Just y) = S.differentiate (S.integrate x ++ S.integrate y)
 removeWorkspace' _ s = s
 
+-- | Should be changed when using xmonad 0.11
 promptRenameCurrentActivityWorkspace :: XPConfig -> String -> X ()
 promptRenameCurrentActivityWorkspace xp s = do
   act <- getCurrentActivity
