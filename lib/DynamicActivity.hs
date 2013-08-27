@@ -316,7 +316,17 @@ filterWorkspaces = do
 addActivity :: ActivityId -> X ()
 addActivity n = do
   AS m <- XS.get
+  addWorkspace (n ++ [activity_workspace_separator] ++ "w1")
+
+  vis <- getVisible
+  when (isJust vis) $ do
+    let vis_wsname = n ++ [activity_workspace_separator] ++ "w2"
+    addHiddenWorkspace vis_wsname
+    windows $ viewOnScreen (S.screen . fromJust $ vis) vis_wsname
+
+  -- Yeah current and visible should not be nothing, but it will be updated when activity will change
   XS.put (AS $ m ++ [Activity {name=n,current=Nothing,visible=Nothing}])
+  XS.put (CS $ (length m))
 
 -- | Del current activity
 delCurrentActivity :: X ()
