@@ -320,6 +320,7 @@ filterWorkspaces = do
 -- | Add an activity
 addActivity :: ActivityId -> X ()
 addActivity n = do
+  storeCurrentActivityContext
   AS m <- XS.get
   addWorkspace (n ++ [activity_workspace_separator] ++ "1")
 
