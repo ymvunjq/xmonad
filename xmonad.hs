@@ -153,10 +153,10 @@ myLogHook h = dynamicLogWithPP $ defaultPP
                                 )
       , ppTitle             =   (" " ++) . dzenColor colorWhiteAlt colorDarkGray . dzenEscape
       , ppOutput            =   hPutStrLn h
-	  , ppExtras            =   [print_activities]
-	  , ppSort              =   liftM2 (.) filterWorkspaces getSortByOrder
+      , ppExtras            =   [print_activities]
+      , ppSort              =   liftM2 (.) filterWorkspaces getSortByOrder
       -- Display extra in first position
-	  , ppOrder             =   \(ws:layout:t:extra) -> extra ++ [ws,layout,t]
+      , ppOrder             =   \(ws:layout:t:extra) -> extra ++ [ws,layout,t]
     }
     where
       hideScratchpad ws = if ws == "NSP" then "" else pad ws -- hide sp in ws list (thanks to p.brisbin)
@@ -176,6 +176,7 @@ myScratchpads = [
 modm = mod4Mask
 activityMod = modm .|. mod5Mask  -- Combination to use activity
 layoutMod = modm .|. controlMask -- Combination to use layout modifier
+wsMod = modm .|. mod1Mask        -- Combination to use ws modifier
 
 
 myGeneralKeys =
@@ -233,9 +234,9 @@ myGeneralKeys =
   , ((activityMod, xK_Left), prevActivity >> runLogHook)
   , ((activityMod, xK_n), promptActivityAdd myPrompt "New Activity : " >> runLogHook)
   , ((activityMod, xK_d), delCurrentActivity >> runLogHook)
-  , ((mod4Mask, xK_d), delCurrentActivityWorkspace >> runLogHook)
-  , ((mod4Mask .|. controlMask, xK_w), promptAddActivityWorkspace myPrompt "Add Workspace : " >> runLogHook)
-  , ((mod4Mask .|. shiftMask, xK_n), debugActivity)
+  , ((wsMod, xK_n), promptAddActivityWorkspace myPrompt "Add Workspace : " >> runLogHook)
+  , ((wsMod, xK_d), delCurrentActivityWorkspace >> runLogHook)
+  , ((activityMod, xK_w), debugActivity)
   ]
   ++
   -- Direct Access to Workspace, to Activity, and shift
