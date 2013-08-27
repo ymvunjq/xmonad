@@ -365,7 +365,7 @@ addActivityWorkspace wsname = do
 
 delActivityWorkspace :: WorkspaceId -> X ()
 delActivityWorkspace wsid = do
-  -- removeWorkspace delete current activity, so we have to switch wsid to current
+  -- removeWorkspace delete current workspace, so we have to switch wsid to current
   windows (S.greedyView wsid)
 
   when (wsid /= trash_workspace) $ do
