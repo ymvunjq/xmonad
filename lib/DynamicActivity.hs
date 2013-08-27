@@ -29,6 +29,7 @@ module DynamicActivity
 	, delCurrentActivity
 	, promptActivityAdd
 	, promptAddActivityWorkspace
+        , promptRenameCurrentActivityWorkspace
 ) where
 
 import Control.Monad
@@ -50,6 +51,9 @@ import XMonad.Actions.DynamicWorkspaceOrder
 import XMonad.Actions.OnScreen (viewOnScreen)
 import XMonad.Actions.WithAll (withAll')
 import XMonad.Hooks.UrgencyHook (readUrgents)
+
+-- Should use renameWorkspaceByName from DynamicWorkspace, but not available in xmonad 0.10
+import XMonad.Prompt.Workspace ( workspacePrompt )
 
 active_activity_color = "#FFA500"
 inactive_activity_color = "#585858"
@@ -82,6 +86,7 @@ instance ExtensionClass ActivityStorage where
 instance ExtensionClass CurrentActivity where
   initialValue = CS $ 0
   extensionType = PersistentExtension
+
 
 debugActivity :: X ()
 debugActivity = do
@@ -316,15 +321,17 @@ filterWorkspaces = do
 addActivity :: ActivityId -> X ()
 addActivity n = do
   AS m <- XS.get
-  addWorkspace (n ++ [activity_workspace_separator] ++ "w1")
+  addWorkspace (n ++ [activity_workspace_separator] ++ "1")
 
   vis <- getVisible
   when (isJust vis) $ do
-    let vis_wsname = n ++ [activity_workspace_separator] ++ "w2"
+    let vis_wsname = n ++ [activity_workspace_separator] ++ "2"
     addHiddenWorkspace vis_wsname
     windows $ viewOnScreen (S.screen . fromJust $ vis) vis_wsname
 
   -- Yeah current and visible should not be nothing, but it will be updated when activity will change
+  -- Anyway a weird behavior will happen if you delete a workspace and then create a new one without having changed activity
+  -- Visible screen won't be updated because I was to lazy to change those Nothing...
   XS.put (AS $ m ++ [Activity {name=n,current=Nothing,visible=Nothing}])
   XS.put (CS $ (length m))
 
@@ -426,3 +433,22 @@ promptActivityAdd xp s =
 promptAddActivityWorkspace :: XPConfig -> String -> X ()
 promptAddActivityWorkspace xp s =
    mkXPrompt (ActivityPrompt s) xp (const $ return []) addActivityWorkspace
+
+removeWorkspace' :: (Eq i) => i -> S.StackSet i l a sid sd -> S.StackSet i l a sid sd
+removeWorkspace' torem s@(S.StackSet { S.current = scr@(S.Screen { S.workspace = wc })
+                                   , S.hidden = (w:ws) })
+    | S.tag w == torem = s { S.current = scr { S.workspace = wc { S.stack = meld (S.stack w) (S.stack wc) } }
+                         , S.hidden = ws }
+   where meld Nothing Nothing = Nothing
+         meld x Nothing = x
+         meld Nothing x = x
+         meld (Just x) (Just y) = S.differentiate (S.integrate x ++ S.integrate y)
+removeWorkspace' _ s = s
+
+promptRenameCurrentActivityWorkspace :: XPConfig -> String -> X ()
+promptRenameCurrentActivityWorkspace xp s = do
+  act <- getCurrentActivity
+  mkXPrompt (ActivityPrompt s) xp (const $ return []) $ \w -> windows $ \wset -> let sett wk = wk { S.tag = ((name act) ++ [activity_workspace_separator] ++ w) }
+                                                                                     setscr scr = scr { S.workspace = sett $ S.workspace scr }
+                                                                                     sets q = q { S.current = setscr $ S.current q }
+                                                                                 in sets $ removeWorkspace' w wset

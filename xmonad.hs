@@ -235,6 +235,7 @@ myGeneralKeys =
   , ((activityMod, xK_n), promptActivityAdd myPrompt "New Activity : " >> runLogHook)
   , ((activityMod, xK_d), delCurrentActivity >> runLogHook)
   , ((wsMod, xK_n), promptAddActivityWorkspace myPrompt "Add Workspace : " >> runLogHook)
+  , ((wsMod, xK_r), promptRenameCurrentActivityWorkspace myPrompt "Rename Workspace : " >> runLogHook)
   , ((wsMod, xK_d), delCurrentActivityWorkspace >> runLogHook)
   , ((activityMod, xK_w), debugActivity)
   ]
