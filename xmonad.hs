@@ -168,7 +168,7 @@ myScratchpads = [
 		NS "python" "urxvt -e ipython" (title =? "ipython") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5),
 		NS "htop" "urxvt -e htop" (title =? "htop") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5),
 		NS "weechat" "urxvt -e weechat-curses" (title =? "weechat-curses") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5),
-                NS "mutt" "urxvt -e mutt" (title =? "mutt") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5)
+                NS "mutt" "urxvt -e mutt" (title =? "mutt") (customFloating $ W.RationalRect 0.125 0.125 0.75 0.75)
 		]
 -----------------------------------------------------------------------------------------------------
 -- SHORTCUT DEFINITIONS
