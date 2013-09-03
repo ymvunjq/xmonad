@@ -80,7 +80,7 @@ data ActivityStorage = AS [Activity] deriving (Typeable, Read, Show)
 data CurrentActivity = CS Int deriving (Typeable, Read, Show)
 
 instance ExtensionClass ActivityStorage where
-  initialValue = AS $ []
+  initialValue = AS $ [Activity{name=no_activity,current=Nothing,visible=Nothing}]
   extensionType = PersistentExtension
 
 instance ExtensionClass CurrentActivity where
