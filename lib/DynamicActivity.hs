@@ -49,11 +49,13 @@ import XMonad.Actions.CycleWS
 import XMonad.Actions.DynamicWorkspaceOrder
 
 import XMonad.Actions.OnScreen (viewOnScreen)
-import XMonad.Actions.WithAll (withAll')
 import XMonad.Hooks.UrgencyHook (readUrgents)
 
 -- Should use renameWorkspaceByName from DynamicWorkspace, but not available in xmonad 0.10
 import XMonad.Prompt.Workspace ( workspacePrompt )
+
+-- To cleanly remove workspaces
+import CleanRemove (cleanRemoveWS)
 
 active_activity_color = "#FFA500"
 inactive_activity_color = "#585858"
@@ -62,7 +64,6 @@ background_activity_color = "#161616"
 no_activity = "*"
 debug_activity = "Debug"
 activity_workspace_separator = '-'
-trash_workspace = "trash"
 
 type ActivityId = String
 type ActivityIndex = Int
@@ -115,12 +116,6 @@ debugActivity = do
 -- Helpers
 screen = fst
 workspace = snd
-
--- | Return True if trash workspace exists
-isTrashWorkspace :: X Bool
-isTrashWorkspace = do
-  ws <- gets (map S.tag . S.workspaces . windowset)
-  return $ elem trash_workspace ws
 
 -- | Output a list of strings, ignoring empty ones and separating the
 --   rest with the given separator.
@@ -387,19 +382,9 @@ addActivityWorkspace wsname = do
 
 delActivityWorkspace :: WorkspaceId -> X ()
 delActivityWorkspace wsid = do
-  -- removeWorkspace delete current workspace, so we have to switch wsid to current
+  -- cleanRemoveWS delete current workspace, so we have to switch wsid to current
   windows (S.greedyView wsid)
-
-  when (wsid /= trash_workspace) $ do
-    exist <- isTrashWorkspace
-    wins <- gets (S.integrate' . S.stack . S.workspace . S.current . windowset)
-
-    when (not exist && (length wins) > 0) $ do
-      addHiddenWorkspace trash_workspace
-
-    withAll' $ S.shiftWin trash_workspace
-
-  removeWorkspace
+  cleanRemoveWS
 
   -- Set a new current workspace for this activity if possible
   act <- getCurrentActivity
