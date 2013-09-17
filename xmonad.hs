@@ -234,6 +234,8 @@ myGeneralKeys =
     -- Activities
   , ((activityMod, xK_Right), nextActivity >> runLogHook)
   , ((activityMod, xK_Left), prevActivity >> runLogHook)
+  , (( mod4Mask, xK_Up), nextActivity >> runLogHook)
+  , (( mod4Mask, xK_Down), prevActivity >> runLogHook)
   , ((activityMod, xK_n), promptActivityAdd myPrompt "New Activity : " >> runLogHook)
   , ((activityMod, xK_d), delCurrentActivity >> runLogHook)
   , ((wsMod, xK_n), promptAddActivityWorkspace myPrompt "Add Workspace : " >> runLogHook)
