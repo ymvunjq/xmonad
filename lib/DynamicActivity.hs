@@ -87,6 +87,17 @@ instance ExtensionClass CurrentActivity where
   initialValue = CS $ 0
   extensionType = PersistentExtension
 
+----------------------------------------------------------------------------------------
+-- ACTIVITY NAME MANAGEMENT
+----------------------------------------------------------------------------------------
+
+-- | Remove activity name from workspace name
+--   Ex: Activity1-ws1 -> ws1
+dropActivityName :: String -> String
+dropActivityName ws = do
+  case (elemIndex activity_workspace_separator ws) of
+    Just x -> drop (x+1) ws
+    Nothing -> ws
 
 debugActivity :: X ()
 debugActivity = do
@@ -158,13 +169,6 @@ colorize_activities as = fmap (sepBy " ") (mapM color as)
 
 activityById :: ActivityIndex -> [Activity] -> Activity
 activityById index list = list !! index
-
--- | Remove activity name from workspace name
-dropActivityName :: String -> String
-dropActivityName ws = do
-  case (elemIndex activity_workspace_separator ws) of
-    Just x -> drop (x+1) ws
-    Nothing -> ws
 
 -- | Return True if Workspace belongs to an activity
 belongToAnActivity :: WorkspaceId -> Bool
