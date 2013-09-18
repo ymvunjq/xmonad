@@ -100,6 +100,19 @@ dropActivityName ws = do
     Just x -> drop (x+1) ws
     Nothing -> ws
 
+-- | Return true if a workspace belongs to an activity (no matter of the activity)
+belongToAnActivity :: WorkspaceId -> Bool
+belongToAnActivity ws = case (elemIndex activity_workspace_separator ws) of
+  Just x -> True
+  Nothing -> False
+
+-- | Return True if ws belongs to activity act
+belongToActivity :: WorkspaceId -> ActivityId -> Bool
+belongToActivity ws act
+  | act == debug_activity = True
+  | act == no_activity = not. belongToAnActivity $ ws
+  | otherwise = take (length act) ws == act
+
 debugActivity :: X ()
 debugActivity = do
   AS activities <- XS.get
@@ -163,20 +176,7 @@ colorize_activities :: [Activity] -> X String
 colorize_activities as = fmap (sepBy " ") (mapM color as)
 
 activityById :: ActivityIndex -> [Activity] -> Activity
-activityById index list = list !! index
-
--- | Return True if Workspace belongs to an activity
-belongToAnActivity :: WorkspaceId -> Bool
-belongToAnActivity ws = case (elemIndex activity_workspace_separator ws) of
-  Just x -> True
-  Nothing -> False
-
--- | Return True if ws belongs to activity act
-belongToActivity :: WorkspaceId -> ActivityId -> Bool
-belongToActivity ws act
-  | act == debug_activity = True
-  | act == no_activity = not. belongToAnActivity $ ws
-  | otherwise = take (length act) ws == act
+activityById index list = list !! index-- | Return True if Workspace belongs to an activity
 
 -- | Activate current workspace of activity if any
 setActivityCurrentWS :: X ()
