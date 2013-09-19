@@ -68,6 +68,20 @@ myManageHook = manageDocks <+> namedScratchpadManageHook myScratchpads <+> scrat
         where
           myFloats = ["Gimp","vmware","Xmessage"]
 
+
+-------------------------------------------------------------------------------------------
+-- ACTIVITY CONFIGURATION
+--
+myActivityConf :: ActivityConfig
+active_activity_color = "#FFA500"
+inactive_activity_color = "#585858"
+urgent_activity_color = "#FF0000"
+background_activity_color = "#161616"
+myActivityConf = defaultActivityConfig { ppActivityActive   = dzenColor active_activity_color background_activity_color,
+                                         ppActivityInactive = dzenColor inactive_activity_color background_activity_color,
+                                         ppActivityUrgent   = dzenColor urgent_activity_color background_activity_color
+                                       }
+
 -------------------------------------------------------------------------------------------
 -- LAYOUT DEFINITIONS
 --
@@ -134,11 +148,11 @@ myIconDir = "/home/ben64/.xmonad/icons/"
 myLogHook :: Handle -> X ()
 myLogHook h = dynamicLogWithPP $ defaultPP
     {
-        ppCurrent           =   dzenColor colorGreen    colorDarkGray . hideScratchpad . dropActivityName
-      , ppVisible           =   dzenColor "#FFFF00" colorDarkGray . hideScratchpad . dropActivityName
-      , ppHidden            =   dzenColor colorBlueAlt  colorDarkGray . hideScratchpad . dropActivityName
-      , ppHiddenNoWindows   =   dzenColor colorGray       colorDarkGray . hideScratchpad . dropActivityName
-      , ppUrgent            =   dzenColor colorRed    colorDarkGray . hideScratchpad . dropActivityName
+        ppCurrent           =   dzenColor colorGreen    colorDarkGray . hideScratchpad . dropActivityName myActivityConf
+      , ppVisible           =   dzenColor "#FFFF00" colorDarkGray . hideScratchpad . dropActivityName myActivityConf
+      , ppHidden            =   dzenColor colorBlueAlt  colorDarkGray . hideScratchpad . dropActivityName myActivityConf
+      , ppHiddenNoWindows   =   dzenColor colorGray       colorDarkGray . hideScratchpad . dropActivityName myActivityConf
+      , ppUrgent            =   dzenColor colorRed    colorDarkGray . hideScratchpad . dropActivityName myActivityConf
       , ppWsSep             =   ""
       , ppSep               =   " | "
       , ppLayout            =   dzenColor colorMagentaAlt colorDarkGray .
@@ -153,8 +167,8 @@ myLogHook h = dynamicLogWithPP $ defaultPP
                                 )
       , ppTitle             =   (" " ++) . dzenColor colorWhiteAlt colorDarkGray . dzenEscape
       , ppOutput            =   hPutStrLn h
-      , ppExtras            =   [print_activities]
-      , ppSort              =   liftM2 (.) filterWorkspaces getSortByOrder
+      , ppExtras            =   [print_activities myActivityConf]
+      , ppSort              =   liftM2 (.) (filterWorkspaces myActivityConf) getSortByOrder
       -- Display extra in first position
       , ppOrder             =   \(ws:layout:t:extra) -> extra ++ [ws,layout,t]
     }
@@ -185,10 +199,10 @@ myGeneralKeys =
     ((mod4Mask, xK_semicolon), sendMessage (IncMasterN (-1)))
 
     -- Workspace Navigation
-  , ((mod4Mask, xK_Right), gotoNextActivityWorkspace >> runLogHook)
-  , ((mod4Mask, xK_Left), gotoPrevActivityWorkspace >> runLogHook)
-  , ((mod4Mask .|. shiftMask, xK_Right), shiftToNextActivityWorkspace >> gotoNextActivityWorkspace)
-  , ((mod4Mask .|. shiftMask, xK_Left), shiftToPrevActivityWorkspace >> gotoPrevActivityWorkspace)
+  , ((mod4Mask, xK_Right), gotoNextActivityWorkspace myActivityConf >> runLogHook)
+  , ((mod4Mask, xK_Left), gotoPrevActivityWorkspace myActivityConf >> runLogHook)
+  , ((mod4Mask .|. shiftMask, xK_Right), shiftToNextActivityWorkspace myActivityConf >> gotoNextActivityWorkspace myActivityConf)
+  , ((mod4Mask .|. shiftMask, xK_Left), shiftToPrevActivityWorkspace myActivityConf >> gotoPrevActivityWorkspace myActivityConf)
 
     -- Screen Navigation
   , ((mod4Mask .|. controlMask, xK_Right), nextScreen)
@@ -232,22 +246,22 @@ myGeneralKeys =
   -- , ((mod4Mask .|. controlMask, xK_f), sendMessage NextLayout)
 
     -- Activities
-  , ((activityMod, xK_Right), nextActivity >> runLogHook)
-  , ((activityMod, xK_Left), prevActivity >> runLogHook)
-  , (( mod4Mask, xK_Down), prevActivity >> runLogHook)
-  , (( mod4Mask, xK_Up), nextActivity >> runLogHook)
-  , ((activityMod, xK_n), promptActivityAdd myPrompt "New Activity : " >> runLogHook)
-  , ((activityMod, xK_d), delCurrentActivity >> runLogHook)
-  , ((wsMod, xK_n), promptAddActivityWorkspace myPrompt "Add Workspace : " >> runLogHook)
-  , ((wsMod, xK_r), promptRenameCurrentActivityWorkspace myPrompt "Rename Workspace : " >> runLogHook)
-  , ((wsMod, xK_d), delCurrentActivityWorkspace >> runLogHook)
+  , ((activityMod, xK_Right), nextActivity myActivityConf >> runLogHook)
+  , ((activityMod, xK_Left), prevActivity myActivityConf >> runLogHook)
+  , (( mod4Mask, xK_Down), prevActivity myActivityConf >> runLogHook)
+  , (( mod4Mask, xK_Up), nextActivity myActivityConf >> runLogHook)
+  , ((activityMod, xK_n), promptActivityAdd myPrompt myActivityConf "New Activity : " >> runLogHook)
+  , ((activityMod, xK_d), delCurrentActivity myActivityConf >> runLogHook)
+  , ((wsMod, xK_n), promptAddActivityWorkspace myPrompt myActivityConf "Add Workspace : " >> runLogHook)
+  , ((wsMod, xK_r), promptRenameCurrentActivityWorkspace myPrompt myActivityConf "Rename Workspace : " >> runLogHook)
+  , ((wsMod, xK_d), delCurrentActivityWorkspace myActivityConf >> runLogHook)
   , ((activityMod, xK_w), debugActivity)
   ]
   ++
   -- Direct Access to Workspace, to Activity, and shift
   [ ((m .|. mod4Mask, k), f i)
   | (i, k) <- zip [0..10] [0x26,0xe9,0x22,0x27,0x28,0x2d,0xe8,0x5f,0xe7,0xe0]
-  , (f, m) <- [(gotoActivityWorkspace, 0),(gotoActivity,activityMod),(shifttoActivityWorkspace,shiftMask)]
+  , (f, m) <- [(gotoActivityWorkspace myActivityConf, 0),(gotoActivity myActivityConf,activityMod),(shifttoActivityWorkspace myActivityConf,shiftMask)]
   ]
 
 -- Concat General keys with specific host keys
