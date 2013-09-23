@@ -23,6 +23,9 @@ module DynamicActivity
 	, gotoActivityWorkspace
 	, gotoNextActivityWorkspace
 	, gotoPrevActivityWorkspace
+        , shiftToActivity
+        , shiftToNextActivity
+        , shiftToPrevActivity
 	, shifttoActivityWorkspace
 	, shiftToNextActivityWorkspace
 	, shiftToPrevActivityWorkspace
@@ -288,7 +291,7 @@ shiftToNextActivityWorkspace conf = shiftToDirectionActivityWorkspace conf Next
 shiftToPrevActivityWorkspace :: ActivityConfig -> X ()
 shiftToPrevActivityWorkspace conf = shiftToDirectionActivityWorkspace conf Prev
 
--- | Generic function
+-- | Run a specific function on focus window of the current activity
 runActivityWorkspace :: ActivityConfig -> WorkspaceIndex -> (WorkspaceId -> WindowSet -> WindowSet) -> X ()
 runActivityWorkspace conf index func = do
   act <- getCurrentActivity
@@ -300,9 +303,31 @@ runActivityWorkspace conf index func = do
 gotoActivityWorkspace :: ActivityConfig -> WorkspaceIndex -> X ()
 gotoActivityWorkspace conf index = runActivityWorkspace conf index S.greedyView
 
--- | Shift Window to another activity workspace
+-- | Shift Focused Window to another workspace of the same activity
 shifttoActivityWorkspace :: ActivityConfig -> WorkspaceIndex -> X ()
 shifttoActivityWorkspace conf index = runActivityWorkspace conf index S.shift
+
+-- | Shift Focused window to the first workspace of another activity
+shiftToActivity :: ActivityConfig -> ActivityIndex -> X ()
+shiftToActivity conf index = do
+  AS activities <- XS.get
+  if length activities < (index+1) then return ()
+  else do
+     let act = activities !! index
+     ws <- getActivityWorkspaces conf . name $ act
+     windows (S.shift (ws !! 0))
+
+shiftToSideActivity :: ActivityConfig -> Int -> X ()
+shiftToSideActivity conf shift = do
+  AS activities <- XS.get
+  CS current <- XS.get
+  shiftToActivity conf ((current+shift) `mod` (length activities))
+
+shiftToNextActivity :: ActivityConfig -> X()
+shiftToNextActivity conf = shiftToSideActivity conf 1
+
+shiftToPrevActivity :: ActivityConfig -> X()
+shiftToPrevActivity conf = shiftToSideActivity conf (-1)
 
 -- | Output activities for ppExtra
 print_activities conf = do
