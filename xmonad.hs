@@ -250,6 +250,11 @@ myGeneralKeys =
   , ((activityMod, xK_Left), prevActivity myActivityConf >> runLogHook)
   , (( mod4Mask, xK_Down), prevActivity myActivityConf >> runLogHook)
   , (( mod4Mask, xK_Up), nextActivity myActivityConf >> runLogHook)
+
+  , ((mod4Mask .|. shiftMask, xK_Up), shiftToNextActivity myActivityConf >> runLogHook)
+  , ((mod4Mask .|. shiftMask, xK_Up), shiftToNextActivity myActivityConf >> runLogHook)
+  , ((mod4Mask .|. shiftMask, xK_Down), shiftToPrevActivity myActivityConf >> runLogHook)
+
   , ((activityMod, xK_n), promptActivityAdd myPrompt myActivityConf "New Activity : " >> runLogHook)
   , ((activityMod, xK_d), delCurrentActivity myActivityConf >> runLogHook)
   , ((wsMod, xK_n), promptAddActivityWorkspace myPrompt myActivityConf "Add Workspace : " >> runLogHook)
@@ -261,7 +266,7 @@ myGeneralKeys =
   -- Direct Access to Workspace, to Activity, and shift
   [ ((m .|. mod4Mask, k), f i)
   | (i, k) <- zip [0..10] [0x26,0xe9,0x22,0x27,0x28,0x2d,0xe8,0x5f,0xe7,0xe0]
-  , (f, m) <- [(gotoActivityWorkspace myActivityConf, 0),(gotoActivity myActivityConf,activityMod),(shifttoActivityWorkspace myActivityConf,shiftMask)]
+  , (f, m) <- [(gotoActivityWorkspace myActivityConf, 0),(gotoActivity myActivityConf,activityMod),(shifttoActivityWorkspace myActivityConf,shiftMask),(shiftToActivity myActivityConf, activityMod .|. shiftMask)]
   ]
 
 -- Concat General keys with specific host keys
