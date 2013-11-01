@@ -138,8 +138,8 @@ colorGreen 			= "#00FF00"
 colorNormalBorder   = colorDarkWhite
 colorFocusedBorder  = colorMagenta
 
-barFont = "-misc-fixed-medium-r-semicondensed-*-12-110-75-75-c-60-koi8-r"
-
+--barFont = "-misc-fixed-medium-r-semicondensed-*-12-110-75-75-c-60-koi8-r"
+barFont = "-*-terminus-*-r-normal-*-11-*-*-*-*-*-iso8859-*"
 
 myStatusBar = "dzen2 -x '0' -y '0' -h '14' -w '960' -ta 'l' -bg '" ++ colorDarkGray ++ "' -fg '" ++ colorCream ++ "' -fn '" ++ barFont ++ "'"
 
@@ -286,7 +286,7 @@ get_keys = myGeneralKeys ++ myHostKeys
 main = do
 	dzenStatusBar <- spawnPipe myStatusBar
 	xmonad $ withUrgencyHook dzenUrgencyHook { args = ["-fn", barFont, "-bg", colorDarkCream, "-fg", colorBlue]}
-               $ defaultConfig{
+               $ ewmh defaultConfig{
 		  --logHook             = myLogHook dzenStatusBar >> setWMName "LG3D"
 		  logHook    = myLogHook dzenStatusBar >> setWMName "LG3D" >> updatePointer (Relative 0.5 0.5)
 		, terminal   = myTerminal
@@ -294,4 +294,5 @@ main = do
 		, manageHook = myManageHook <+> manageHook defaultConfig
 		, workspaces = myWorkspaces
 		, modMask    = mod4Mask 	-- Rebind Mod to the Window Key
+		, handleEventHook = handleEventHook defaultConfig <+> fullscreenEventHook
       }  `additionalKeys` get_keys
