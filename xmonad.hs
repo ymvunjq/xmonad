@@ -44,7 +44,7 @@ import XMonad.Actions.DynamicWorkspaces
 import XMonad.Actions.DynamicWorkspaceOrder
 
 -- Util
-import XMonad.Util.Run(spawnPipe)
+import XMonad.Util.Run(spawnPipe,safeSpawn)
 import XMonad.Util.EZConfig(additionalKeys)
 import XMonad.Util.Scratchpad
 import XMonad.Util.NamedScratchpad
@@ -138,10 +138,10 @@ colorGreen 			= "#00FF00"
 colorNormalBorder   = colorDarkWhite
 colorFocusedBorder  = colorMagenta
 
---barFont = "-misc-fixed-medium-r-semicondensed-*-12-110-75-75-c-60-koi8-r"
-barFont = "-*-terminus-*-r-normal-*-11-*-*-*-*-*-iso8859-*"
+barFont = "-misc-fixed-medium-r-semicondensed-*-12-110-75-75-c-60-koi8-r"
 
 myStatusBar = "dzen2 -x '0' -y '0' -h '14' -w '960' -ta 'l' -bg '" ++ colorDarkGray ++ "' -fg '" ++ colorCream ++ "' -fn '" ++ barFont ++ "'"
+mySecondStatusBar = "/home/ben64/Documents/tool/dzen2conf/conf_dzen.py"
 
 myIconDir = "/home/ben64/.xmonad/icons/"
 
@@ -196,7 +196,9 @@ wsMod = modm .|. mod1Mask        -- Combination to use ws modifier
 
 myGeneralKeys =
   [
-    ((mod4Mask, xK_semicolon), sendMessage (IncMasterN (-1)))
+    -- Restart xmonad and all dzen2 bar
+    ((mod4Mask, xK_q), spawn "if type xmonad; then kill $(ps ax | grep conf_dzen | grep -v grep | awk '{print $1}'); killall dzen2; xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
+  , ((mod4Mask, xK_semicolon), sendMessage (IncMasterN (-1)))
 
     -- Workspace Navigation
   , ((mod4Mask, xK_Right), gotoNextActivityWorkspace myActivityConf >> runLogHook)
@@ -284,6 +286,8 @@ get_keys = myGeneralKeys ++ myHostKeys
 -- MAIN
 --
 main = do
+	-- Launch right bar
+	safeSpawn mySecondStatusBar ["--font"," " ++ barFont]
 	dzenStatusBar <- spawnPipe myStatusBar
 	xmonad $ withUrgencyHook dzenUrgencyHook { args = ["-fn", barFont, "-bg", colorDarkCream, "-fg", colorBlue]}
                $ ewmh defaultConfig{
