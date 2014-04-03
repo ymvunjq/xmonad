@@ -225,6 +225,7 @@ myGeneralKeys =
   , ((mod4Mask, xK_e), spawn "emacs")
   , ((mod4Mask, xK_c), spawn "chrome")
   , ((mod4Mask .|. shiftMask, xK_i), spawn "urxvt -e irb1.9.1")
+  , ((mod4Mask, xK_v), spawn "urxvt -e mc -u")
 
     -- Scratchpads
   , ((mod4Mask, xK_twosuperior), scratchpadSpawnAction defaultConfig {terminal=myTerminal})
