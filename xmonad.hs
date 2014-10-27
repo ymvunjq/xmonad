@@ -182,7 +182,8 @@ myScratchpads = [
 		NS "python" "urxvt -title ipython -e zsh -i -c ipython" (title =? "ipython") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5),
 		NS "htop" "urxvt -e htop" (title =? "htop") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5),
 		NS "weechat" "urxvt -e weechat-curses" (title =? "weechat-curses") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5),
-                NS "mutt" "urxvt -e mutt" (title =? "mutt") (customFloating $ W.RationalRect 0.125 0.125 0.75 0.75)
+        NS "mutt" "urxvt -e mutt" (title =? "mutt") (customFloating $ W.RationalRect 0.125 0.125 0.75 0.75),
+        NS "syslog" "urxvt -title syslog -e tail -f /var/log/syslog" (title =? "syslog") (customFloating $ W.RationalRect 0.125 0.125 0.75 0.75)
 		]
 -----------------------------------------------------------------------------------------------------
 -- SHORTCUT DEFINITIONS
@@ -233,6 +234,7 @@ myGeneralKeys =
   , ((mod4Mask, xK_z), namedScratchpadAction myScratchpads "htop")
   , ((mod4Mask, xK_r), namedScratchpadAction myScratchpads "weechat")
   , ((mod4Mask, xK_m), namedScratchpadAction myScratchpads "mutt")
+  , ((mod4Mask, xK_x), namedScratchpadAction myScratchpads "syslog")
 
     -- WMII
   -- , ((mod4Mask .|. controlMask, xK_h), focusGroupUp)
