@@ -2,6 +2,7 @@ import Control.Monad
 
 import XMonad hiding ( (|||) )
 import XMonad.Config.Desktop
+import XMonad.Config.Gnome
 import System.IO
 import System.Directory
 import qualified Data.Map as M
@@ -26,6 +27,8 @@ import XMonad.Layout.Circle
 import XMonad.Layout.LayoutCombinators
 import XMonad.Layout.Named
 import XMonad.Layout.Grid
+import XMonad.Layout.NoBorders
+import XMonad.Layout.ToggleLayouts (toggleLayouts)
 --import XMonad.Layout.Groups.Wmii
 import XMonad.Layout.Reflect       -- ability to reflect layouts
 import XMonad.Layout.MultiToggle   -- apply layout modifiers dynamically
@@ -94,7 +97,7 @@ myLayout = avoidStruts $
            ||| Grid
            ||| tabbed shrinkText defaultTheme
            ||| threeCol
-           ||| named "Full" Full
+           ||| named "Full" (noBorders Full)
 --           ||| named "Stacked" (wmii shrinkText defaultTheme ||| tiled ||| threeCol)
    where
      tiled   = Tall nmaster delta ratio  -- default tiling algorithm partitions the screen into two panes
@@ -293,13 +296,14 @@ main = do
 	safeSpawn mySecondStatusBar ["--font"," " ++ barFont]
 	dzenStatusBar <- spawnPipe myStatusBar
 	xmonad $ withUrgencyHook dzenUrgencyHook { args = ["-fn", barFont, "-bg", colorDarkCream, "-fg", colorBlue]}
-               $ ewmh defaultConfig{
+               $ ewmh gnomeConfig{
 		  --logHook             = myLogHook dzenStatusBar >> setWMName "LG3D"
 		  logHook    = myLogHook dzenStatusBar >> setWMName "LG3D" >> updatePointer (Relative 0.5 0.5)
 		, terminal   = myTerminal
-		, layoutHook = myLayout
+		, layoutHook = avoidStruts $ myLayout
 		, manageHook = myManageHook <+> manageHook defaultConfig
 		, workspaces = myWorkspaces
 		, modMask    = mod4Mask 	-- Rebind Mod to the Window Key
 		, handleEventHook = handleEventHook defaultConfig <+> fullscreenEventHook
+		, startupHook = startupHook gnomeConfig >> setWMName "LG3D"
       }  `additionalKeys` get_keys
