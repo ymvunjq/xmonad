@@ -27,12 +27,11 @@ import XMonad.Layout.Circle
 import XMonad.Layout.LayoutCombinators
 import XMonad.Layout.Named
 import XMonad.Layout.Grid
-import XMonad.Layout.NoBorders
-import XMonad.Layout.ToggleLayouts (toggleLayouts)
 --import XMonad.Layout.Groups.Wmii
 import XMonad.Layout.Reflect       -- ability to reflect layouts
 import XMonad.Layout.MultiToggle   -- apply layout modifiers dynamically
 import XMonad.Layout.MultiToggle.Instances
+import XMonad.Layout.NoBorders
 
 -- Key Definition
 import XMonad.Prompt
@@ -66,10 +65,10 @@ myWorkspaces = ["1","2","3","4","5","6","7","8","9","0"]
 
 myManageHook = manageDocks <+> namedScratchpadManageHook myScratchpads <+> scratchpadManageHook (W.RationalRect 0.125 0.25 0.75 0.5) <+> (composeAll . concat $
         [   [ className =? x --> doFloat | x <- myFloats]
-	  , [isFullscreen --> (doF W.focusDown <+> doFullFloat)]
+          , [isFullscreen --> (doF W.focusDown <+> doFullFloat)]
 	])
         where
-          myFloats = ["Gimp","vmware","Xmessage"]
+          myFloats = ["Gimp","Xmessage","vmware"]
 
 
 -------------------------------------------------------------------------------------------
@@ -97,7 +96,7 @@ myLayout = avoidStruts $
            ||| Grid
            ||| tabbed shrinkText defaultTheme
            ||| threeCol
-           ||| named "Full" (noBorders Full)
+           ||| named "Full" Full
 --           ||| named "Stacked" (wmii shrinkText defaultTheme ||| tiled ||| threeCol)
    where
      tiled   = Tall nmaster delta ratio  -- default tiling algorithm partitions the screen into two panes
@@ -300,7 +299,7 @@ main = do
 		  --logHook             = myLogHook dzenStatusBar >> setWMName "LG3D"
 		  logHook    = myLogHook dzenStatusBar >> setWMName "LG3D" >> updatePointer (Relative 0.5 0.5)
 		, terminal   = myTerminal
-		, layoutHook = avoidStruts $ myLayout
+		, layoutHook = lessBorders OnlyFloat $ avoidStruts $ myLayout
 		, manageHook = myManageHook <+> manageHook defaultConfig
 		, workspaces = myWorkspaces
 		, modMask    = mod4Mask 	-- Rebind Mod to the Window Key
