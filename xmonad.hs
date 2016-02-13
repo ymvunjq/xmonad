@@ -60,7 +60,7 @@ import DynamicActivity
 import Host
 
 -- Modular Configuration
-myTerminal = "urxvt"
+myTerminal = "urxvtc"
 myWorkspaces = ["1","2","3","4","5","6","7","8","9","0"]
 
 myManageHook = manageDocks <+> namedScratchpadManageHook myScratchpads <+> scratchpadManageHook (W.RationalRect 0.125 0.25 0.75 0.5) <+> (composeAll . concat $
@@ -181,11 +181,11 @@ myLogHook h = dynamicLogWithPP $ defaultPP
 -- SCRATCHPAD
 --
 myScratchpads = [
-		NS "python" "urxvt -title ipython -e zsh -i -c ipython" (title =? "ipython") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5),
-		NS "htop" "urxvt -e htop" (title =? "htop") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5),
-		NS "weechat" "urxvt -e weechat-curses" (title =? "weechat-curses") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5),
-        NS "mutt" "urxvt -e mutt" (title =? "mutt") (customFloating $ W.RationalRect 0.125 0.125 0.75 0.75),
-        NS "syslog" "urxvt -title syslog -e tail -f /var/log/syslog" (title =? "syslog") (customFloating $ W.RationalRect 0.125 0.125 0.75 0.75)
+		NS "python" "urxvtc -title ipython -e zsh -i -c ipython" (title =? "ipython") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5),
+		NS "htop" "urxvtc -e htop" (title =? "htop") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5),
+		NS "weechat" "urxvtc -e weechat-curses" (title =? "weechat-curses") (customFloating $ W.RationalRect 0.125 0.25 0.75 0.5),
+        NS "mutt" "urxvtc -e mutt" (title =? "mutt") (customFloating $ W.RationalRect 0.125 0.125 0.75 0.75),
+        NS "syslog" "urxvtc -title syslog -e tail -f /var/log/syslog" (title =? "syslog") (customFloating $ W.RationalRect 0.125 0.125 0.75 0.75)
 		]
 -----------------------------------------------------------------------------------------------------
 -- SHORTCUT DEFINITIONS
@@ -223,12 +223,13 @@ myGeneralKeys =
   , ((layoutMod, xK_y), sendMessage $ Toggle REFLECTY)
 
     -- Useful toolz
-  , ((mod4Mask, xK_s), spawn "urxvt")
-  , ((mod4Mask, xK_i), spawn "urxvt -e ipython")
+  , ((mod4Mask .|. shiftMask, xK_s), spawn "urxvt")
+  , ((mod4Mask, xK_s), spawn "urxvtc")
+  , ((mod4Mask, xK_i), spawn "urxvtc -e ipython")
   , ((mod4Mask, xK_e), spawn "emacs")
   , ((mod4Mask, xK_c), spawn "chrome")
-  , ((mod4Mask .|. shiftMask, xK_i), spawn "urxvt -e irb1.9.1")
-  , ((mod4Mask, xK_v), spawn "urxvt -e mc -u")
+  , ((mod4Mask .|. shiftMask, xK_i), spawn "urxvtc -e irb1.9.1")
+  , ((mod4Mask, xK_v), spawn "urxvtc -e mc -u")
 
     -- Scratchpads
   , ((mod4Mask, xK_twosuperior), scratchpadSpawnAction defaultConfig {terminal=myTerminal})
